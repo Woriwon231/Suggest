@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputText;
     private ArrayAdapter<String> resultAdapter;
 
+    private final static String KEY_NAME = "MainActivity.name";
+    private String keepText = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,10 +38,16 @@ public class MainActivity extends AppCompatActivity {
         Button suggestButton = (Button)findViewById(R.id.suggest_button);
         ListView resultList = (ListView)findViewById(R.id.result_list);
 
+        if(savedInstanceState != null) {
+            keepText = savedInstanceState.getString(KEY_NAME);
+            new SuggestTask().execute(keepText);
+        }
+
         suggestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String queryText = inputText.getText().toString().trim();
+                keepText = queryText;
                 new SuggestTask().execute(queryText);
             }
         });
@@ -54,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_NAME,keepText);
     }
 
     private class SuggestTask extends AsyncTask<String, Void, List<String>> {
